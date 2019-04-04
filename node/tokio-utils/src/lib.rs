@@ -65,8 +65,10 @@ impl Drop for ShutdownableThread {
     fn drop(&mut self) {
         // Ignore the panic from child thread
         if let Some(InitializedState { thread, shutdown_tx }) = self.state.take() {
+            error!("Trying to kill thread...");
             let _ = shutdown_tx.send(()).map_err(|_| error!("Error sending shutdown signal"));
             let _ = thread.join().map_err(|_| error!("Error joining child thread"));
+            error!("Killed thread");
         }
     }
 }
